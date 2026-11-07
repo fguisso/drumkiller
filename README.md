@@ -1,5 +1,12 @@
 # DRUMKILLER
 
+This fork adds a playable **Stand By Me second-part study**: 25 bars at 122 BPM,
+an exact expert chart and a generated click backing. Run `npm run dev:study`
+to try it locally, or generate an importable ZIP with `npm run study:stand-by-me`.
+See [the study guide](docs/STAND-BY-ME.md) for the Aroma MIDI setup, source
+notation, tests and the recording alignment that still needs confirmation.
+The original game and MIT attribution are preserved below.
+
 **Play it now: https://sam1am.github.io/drumkiller/**
 
 A finger-drumming rhythm game in the spirit of Guitar Hero — for MIDI pad controllers (4×4 pads, Yamaha FGDP-30/50, e-kits) — that runs in the browser on Mac, Linux, and Windows.

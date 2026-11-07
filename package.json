@@ -12,7 +12,14 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "demo-song": "node scripts/make-demo-song.mjs",
-    "e2e": "node scripts/browser-test.mjs"
+    "e2e": "node scripts/browser-test.mjs",
+    "study:stand-by-me": "node scripts/make-groove-song.mjs",
+    "predev": "npm run study:stand-by-me && npm run study:full",
+    "prebuild": "npm run study:stand-by-me && npm run study:full",
+    "dev:study": "npm run dev -- --host 127.0.0.1 --port 5175 --strictPort",
+    "e2e:study": "node scripts/study-browser-test.mjs",
+    "study:full": "node scripts/make-groove-song.mjs studies/stand-by-me-completa.json",
+    "dev:full": "npm run study:full && vite --host 127.0.0.1 --port 5176 --strictPort"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

@@ -12,9 +12,13 @@ const DIFF_LABEL: Record<Difficulty, string> = { easy: 'EASY', medium: 'MEDIUM',
 
 export function songSelectScreen(app: App, params?: Record<string, unknown>): Screen {
   const practice = params?.practice === true;
+  const requested = new URLSearchParams(location.search);
   let entries: SongListEntry[] = [];
   let selected: SongListEntry | null = null;
-  let difficulty: Difficulty = (localStorage.getItem('dk.lastDifficulty') as Difficulty) || 'medium';
+  const requestedDifficulty = requested.get('difficulty');
+  let difficulty: Difficulty = ['easy', 'medium', 'hard', 'expert'].includes(requestedDifficulty ?? '')
+    ? requestedDifficulty as Difficulty
+    : (localStorage.getItem('dk.lastDifficulty') as Difficulty) || 'medium';
   let previewTransport: Transport | null = null;
   let previewToken = 0;
 
@@ -138,18 +142,20 @@ export function songSelectScreen(app: App, params?: Record<string, unknown>): Sc
       h('h3', null, practice ? 'Practice' : 'Leaderboard'),
       practice ? h('div', { class: 'hint-box' }, 'Practice mode: adjust speed, loop sections, hear guide drums. Scores are not saved.') : lb,
       h('div', { class: 'btn-row', style: { marginTop: '20px' } },
-        Object.assign(button(practice ? 'PRACTICE' : 'PLAY', () => play(e), 'primary big'), { disabled: !playable.length }),
+        Object.assign(button(practice ? 'TOCAR' : 'PLAY', () => play(e), 'primary big'), { disabled: !playable.length }),
+        practice ? Object.assign(button('OUVIR GUIA', () => play(e, true), 'big'), { disabled: !playable.length }) : null,
         e.source !== 'bundled' ? button('REMOVE', () => remove(e), 'danger') : null,
       ),
     );
   }
 
-  async function play(e: SongListEntry): Promise<void> {
+  async function play(e: SongListEntry, guide = false): Promise<void> {
     stopPreview();
     await app.boot();
     try {
       const pkg = await app.library.load(e);
-      app.navigate('game', { pkg, difficulty, mode: practice ? 'practice' : 'play' });
+      app.navigate('game', { pkg, difficulty, mode: practice ? 'practice' : 'play',
+        guideDrums: guide, drumSoundsOnHit: guide ? false : app.settings.drumSoundsOnHit });
     } catch (err) {
       toast(`Could not load song: ${(err as Error).message}`, 'bad');
     }
@@ -230,7 +236,7 @@ export function songSelectScreen(app: App, params?: Record<string, unknown>): Sc
   );
   refresh().then(() => {
     // auto-select last played song
-    const lastId = localStorage.getItem('dk.lastSong');
+    const lastId = requested.get('song') ?? localStorage.getItem('dk.lastSong');
     const e = entries.find((x) => x.meta.id === lastId) ?? entries[0];
     if (e) {
       const card = list.children[entries.indexOf(e)] as HTMLElement | undefined;
