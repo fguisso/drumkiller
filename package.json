@@ -12,7 +12,12 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "demo-song": "node scripts/make-demo-song.mjs",
-    "e2e": "node scripts/browser-test.mjs"
+    "e2e": "node scripts/browser-test.mjs",
+    "study:stand-by-me": "node scripts/make-groove-song.mjs",
+    "predev": "npm run study:stand-by-me",
+    "prebuild": "npm run study:stand-by-me",
+    "dev:study": "npm run dev -- --host 127.0.0.1 --port 5175 --strictPort",
+    "e2e:study": "node scripts/study-browser-test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

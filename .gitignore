@@ -3,3 +3,7 @@ dist
 .DS_Store
 *.log
 .e2e
+
+# Personal audio, generated study packages and local analysis
+local/
+public/songs/stand-by-me-segunda-parte-study/
