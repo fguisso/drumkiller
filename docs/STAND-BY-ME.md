@@ -11,7 +11,8 @@ npm ci
 npm run dev:study
 ```
 
-Abra <http://127.0.0.1:5175/#songs-practice>. A música já aparece na biblioteca.
+Abra <http://127.0.0.1:5175/?song=stand-by-me-segunda-parte-study&difficulty=expert#songs-practice>.
+A música e a dificuldade Expert já ficam selecionadas na biblioteca.
 A tela abre sem iniciar a reprodução. Selecionar um cartão inicia a prévia
 de áudio do jogo; para tocar, escolha a dificuldade e pressione **PRACTICE**.
 

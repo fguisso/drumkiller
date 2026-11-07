@@ -12,9 +12,13 @@ const DIFF_LABEL: Record<Difficulty, string> = { easy: 'EASY', medium: 'MEDIUM',
 
 export function songSelectScreen(app: App, params?: Record<string, unknown>): Screen {
   const practice = params?.practice === true;
+  const requested = new URLSearchParams(location.search);
   let entries: SongListEntry[] = [];
   let selected: SongListEntry | null = null;
-  let difficulty: Difficulty = (localStorage.getItem('dk.lastDifficulty') as Difficulty) || 'medium';
+  const requestedDifficulty = requested.get('difficulty');
+  let difficulty: Difficulty = ['easy', 'medium', 'hard', 'expert'].includes(requestedDifficulty ?? '')
+    ? requestedDifficulty as Difficulty
+    : (localStorage.getItem('dk.lastDifficulty') as Difficulty) || 'medium';
   let previewTransport: Transport | null = null;
   let previewToken = 0;
 
@@ -230,7 +234,7 @@ export function songSelectScreen(app: App, params?: Record<string, unknown>): Sc
   );
   refresh().then(() => {
     // auto-select last played song
-    const lastId = localStorage.getItem('dk.lastSong');
+    const lastId = requested.get('song') ?? localStorage.getItem('dk.lastSong');
     const e = entries.find((x) => x.meta.id === lastId) ?? entries[0];
     if (e) {
       const card = list.children[entries.indexOf(e)] as HTMLElement | undefined;
