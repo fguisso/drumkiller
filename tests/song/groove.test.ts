@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import study from '../../studies/stand-by-me-segunda-parte.json';
+import complete from '../../studies/stand-by-me-completa.json';
 import { chartFromGroove, type GrooveStudy } from '@/song/groove';
 import { chartFromMidi } from '@/midi/chart';
 import { parseMidi } from '@/midi/smf';
@@ -16,6 +17,20 @@ const temp = await mkdtemp(path.join(tmpdir(), 'dk-groove-'));
 afterAll(() => rm(temp, { recursive: true, force: true }));
 
 describe('approved Stand By Me second part', () => {
+  it('preserves both parts and adds exactly eight open-hat bars plus one fill', () => {
+    const { chart, bars } = chartFromGroove(complete.groove);
+    expect(bars).toBe(63);
+    expect(chart.notes).toHaveLength(757);
+    expect(complete.groove.repeats.slice(13, 24)).toEqual(study.groove.repeats);
+    expect(complete.groove.repeats.slice(-2)).toEqual([8, 1]);
+    for (let bar = 54; bar < 62; bar++) {
+      const notes = chart.notes.filter((n) => n.tick >= bar * 1920 && n.tick < (bar + 1) * 1920);
+      expect(notes.filter((n) => n.voice === 'hihatOpen')).toHaveLength(8);
+      expect(notes.filter((n) => n.voice === 'ride')).toHaveLength(0);
+    }
+    const final = chart.notes.filter((n) => n.tick >= 62 * 1920);
+    expect(final.filter((n) => n.voice === 'snare').map((n) => n.tick - 62 * 1920)).toEqual([240, 480, 960, 1440, 1680, 1800]);
+  });
   it('generates a ZIP accepted by the actual importer, with every approved hit in order', async () => {
     const output = path.join(temp, 'study');
     await promisify(execFile)(process.execPath, [

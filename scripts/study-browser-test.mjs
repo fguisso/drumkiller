@@ -65,7 +65,7 @@ try {
   assert.equal(await evaluate('window.dk.booted'), false, 'opening the library does not start audio or MIDI');
   await evaluate(`Array.from(document.querySelectorAll('.songcard')).find((c) => c.textContent.includes(${JSON.stringify(title)})).click()`);
   await evaluate(`document.querySelector('.diff[data-d="expert"]').click()`);
-  await evaluate(`Array.from(document.querySelectorAll('button')).find((b) => b.textContent.trim() === 'PRACTICE').click()`);
+  await evaluate(`Array.from(document.querySelectorAll('button')).find((b) => b.textContent.trim() === 'TOCAR').click()`);
   for (let i = 0; i < 100; i++) {
     if (await evaluate('!!window.dkSession')) break;
     await sleep(100);

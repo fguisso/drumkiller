@@ -108,7 +108,9 @@ export async function gameScreen(app: App, params?: Record<string, unknown>): Pr
   let countdown: number | null = null;
   let pauseOverlay: HTMLElement | null = null;
   let rate = mode === 'practice' ? Number(localStorage.getItem('dk.practiceRate') ?? 1) || 1 : 1;
-  let guideDrums = mode === 'practice' ? localStorage.getItem('dk.guideDrums') === '1' : false;
+  let guideDrums = mode === 'practice' && (typeof params?.guideDrums === 'boolean'
+    ? params.guideDrums : localStorage.getItem('dk.guideDrums') === '1');
+  let padSounds = typeof params?.drumSoundsOnHit === 'boolean' ? params.drumSoundsOnHit : settings.drumSoundsOnHit;
   let loopA: number | null = null;
   let loopB: number | null = null;
 
@@ -206,7 +208,7 @@ export async function gameScreen(app: App, params?: Record<string, unknown>): Pr
         hitWindowScale: settings.hitWindowScale,
         strictVoices: settings.strictVoices,
         scrollWindow: settings.scrollWindow,
-        drumSoundsOnHit: settings.drumSoundsOnHit,
+        drumSoundsOnHit: padSounds,
         reducedMotion: settings.reducedMotion,
         laneOrder: settings.laneOrder,
         loop: null,
@@ -313,11 +315,17 @@ export async function gameScreen(app: App, params?: Record<string, unknown>): Pr
         loopLabel.className = 'pill';
       }
     };
-    const guideBtn = button(`GUIDE DRUMS: ${guideDrums ? 'ON' : 'OFF'}`, () => {
+    const guideBtn = button(`GUIA MIDI: ${guideDrums ? 'ON' : 'OFF'}`, () => {
       guideDrums = !guideDrums;
-      localStorage.setItem('dk.guideDrums', guideDrums ? '1' : '0');
-      toast('Guide drums will apply on restart', '');
-      guideBtn.textContent = `GUIDE DRUMS: ${guideDrums ? 'ON' : 'OFF'}`;
+      session?.setGuideDrums(guideDrums);
+      if (params) params.guideDrums = guideDrums;
+      guideBtn.textContent = `GUIA MIDI: ${guideDrums ? 'ON' : 'OFF'}`;
+    });
+    const padBtn = button(`MINHAS BATIDAS: ${padSounds ? 'ON' : 'OFF'}`, () => {
+      padSounds = !padSounds;
+      session?.setPadSounds(padSounds);
+      if (params) params.drumSoundsOnHit = padSounds;
+      padBtn.textContent = `MINHAS BATIDAS: ${padSounds ? 'ON' : 'OFF'}`;
     });
     practiceBar.append(
       button('−', () => setRate(rate - 0.05), 'icon'),
@@ -330,6 +338,7 @@ export async function gameScreen(app: App, params?: Record<string, unknown>): Pr
       button('CLEAR', () => { loopA = loopB = null; updateLoop(); }, 'icon ghost'),
       loopLabel,
       guideBtn,
+      padBtn,
     );
   }
 

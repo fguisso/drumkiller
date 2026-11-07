@@ -186,6 +186,24 @@ export class GameSession {
     this.guide?.resync();
   }
 
+  /** Practice guide uses the existing chart scheduler and the same internal kit as pad hits. */
+  setGuideDrums(enabled: boolean): void {
+    this.cfg.guideDrums = enabled;
+    if (!enabled) {
+      this.guide?.stop();
+      this.guide = null;
+    } else if (this.cfg.mode === 'practice' && !this.guide) {
+      this.guide = new ChartPlayer(this.engine, this.kit, this.transport);
+      this.guide.setNotes(this.cfg.chart.notes);
+      this.guide.setOffset(this.cfg.meta.offset);
+      if (this.running && !this.paused) this.guide.start();
+    }
+  }
+
+  setPadSounds(enabled: boolean): void {
+    this.cfg.drumSoundsOnHit = enabled;
+  }
+
   stop(): void {
     this.running = false;
     cancelAnimationFrame(this.raf);

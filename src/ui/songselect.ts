@@ -142,18 +142,20 @@ export function songSelectScreen(app: App, params?: Record<string, unknown>): Sc
       h('h3', null, practice ? 'Practice' : 'Leaderboard'),
       practice ? h('div', { class: 'hint-box' }, 'Practice mode: adjust speed, loop sections, hear guide drums. Scores are not saved.') : lb,
       h('div', { class: 'btn-row', style: { marginTop: '20px' } },
-        Object.assign(button(practice ? 'PRACTICE' : 'PLAY', () => play(e), 'primary big'), { disabled: !playable.length }),
+        Object.assign(button(practice ? 'TOCAR' : 'PLAY', () => play(e), 'primary big'), { disabled: !playable.length }),
+        practice ? Object.assign(button('OUVIR GUIA', () => play(e, true), 'big'), { disabled: !playable.length }) : null,
         e.source !== 'bundled' ? button('REMOVE', () => remove(e), 'danger') : null,
       ),
     );
   }
 
-  async function play(e: SongListEntry): Promise<void> {
+  async function play(e: SongListEntry, guide = false): Promise<void> {
     stopPreview();
     await app.boot();
     try {
       const pkg = await app.library.load(e);
-      app.navigate('game', { pkg, difficulty, mode: practice ? 'practice' : 'play' });
+      app.navigate('game', { pkg, difficulty, mode: practice ? 'practice' : 'play',
+        guideDrums: guide, drumSoundsOnHit: guide ? false : app.settings.drumSoundsOnHit });
     } catch (err) {
       toast(`Could not load song: ${(err as Error).message}`, 'bad');
     }
